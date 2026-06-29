@@ -1,0 +1,11 @@
+services:
+  espresso-logger:
+    build: .
+    container_name: espresso-logger
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: file:/app/data/espresso.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
