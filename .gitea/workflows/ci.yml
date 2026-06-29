@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container:
+      image: node:26-trixie
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify Node runtime
+        run: |
+          node --version
+          node -e "import('node:sqlite')"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check Svelte and TypeScript
+        run: npm run check
+
+      - name: Build application
+        run: npm run build

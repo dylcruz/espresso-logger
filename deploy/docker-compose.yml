@@ -1,12 +1,12 @@
 services:
   espresso-logger:
-    build: .
+    image: ${IMAGE:?Set IMAGE to the container image}
     container_name: espresso-logger
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: file:/app/data/espresso.db
-      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      ORIGIN: ${ORIGIN:?Set ORIGIN to the public app URL}
     volumes:
       - ./data:/app/data
     restart: unless-stopped
