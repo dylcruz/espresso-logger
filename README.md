@@ -14,7 +14,7 @@ Photo uploads are intentionally left for a future iteration.
 
 ## Local Development
 
-Local runtime requires Node 26 or newer because the app uses Node's built-in `node:sqlite` module. Bun can install dependencies and run type checks, but it cannot run the app runtime because Bun does not implement `node:sqlite`.
+Local runtime requires Node 26 or newer because the app uses Node's built-in `node:sqlite` module.
 
 ```bash
 npm install
@@ -22,13 +22,6 @@ npm run dev
 ```
 
 Open `http://localhost:5173`.
-
-With Bun installed, this check is useful:
-
-```bash
-bun install
-bun run check
-```
 
 ## Coolify Deployment
 

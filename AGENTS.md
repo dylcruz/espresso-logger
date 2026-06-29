@@ -2,7 +2,6 @@
 
 ## Runtime And Commands
 - This app targets Node 26+ because server code imports Node's built-in `node:sqlite` in `src/lib/server/db.ts`.
-- Bun can run `bun install` and `bun run check`, but do not use Bun for `dev`, `build`, or runtime: Bun does not provide `node:sqlite`.
 - Local Node workflow, if Node 26+ is installed: `npm install`, `npm run check`, `npm run build`, `npm run dev`.
 - Production deploys through Coolify building the root `Dockerfile` directly from Gitea.
 - Optional Dockerfile verification, if Docker is available: `docker build -t espresso-logger .`.
