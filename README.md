@@ -8,7 +8,7 @@ A single-user, LAN-only espresso logbook for tracking coffees, Breville Barista 
 - Shot log with dose, yield, time, grind settings, temperature, rating, and tasting notes.
 - Metric/imperial display toggle.
 - SQLite storage in `./data/espresso.db`.
-- Docker Compose deployment for homelab hosting.
+- Coolify deployment for homelab hosting.
 
 Photo uploads are intentionally left for a future iteration.
 
@@ -30,21 +30,22 @@ bun install
 bun run check
 ```
 
-## Docker Deployment
+## Coolify Deployment
 
-```bash
-docker compose up -d --build
-```
+Deploy the app in Coolify from the Gitea repository and let Coolify build the existing `Dockerfile` directly.
 
-Open `http://localhost:3000`.
+Use these Coolify settings:
 
-If you access the app from another device, set `ORIGIN` to the exact URL you use in the browser:
+- Build pack: Dockerfile
+- Dockerfile path: `Dockerfile`
+- Exposed port: `3000`
+- Persistent storage mount: `/app/data`
+- Environment variable: `DATABASE_URL=file:/app/data/espresso.db`
+- Environment variable: `ORIGIN=<production app URL>`
 
-```bash
-ORIGIN=http://<your-server-ip>:3000 docker compose up -d --build
-```
+`ORIGIN` must exactly match the URL used in the browser, for example `https://espresso.example.com`.
 
-The database is stored at `./data/espresso.db`. Back up the `data` directory to preserve your logbook.
+The production database is stored at `/app/data/espresso.db`. Configure persistent storage for `/app/data` in Coolify and back it up to preserve your logbook.
 
 ## Configuration
 
@@ -54,33 +55,18 @@ The app reads `DATABASE_URL` and `ORIGIN`. `DATABASE_URL` defaults to:
 file:./data/espresso.db
 ```
 
-The provided Docker Compose file uses:
+Production deployments should use:
 
 ```text
 file:/app/data/espresso.db
 ```
 
-`ORIGIN` must match the browser URL for production Docker form submissions. Docker Compose defaults it to `http://localhost:3000`.
+`ORIGIN` must match the browser URL for production form submissions. For local development, it can be omitted or set to `http://localhost:3000` when running the built Node server.
 
-## Gitea CI/CD
+## Gitea CI
 
 Gitea Actions workflows live in `.gitea/workflows`:
 
 - `ci.yml` runs on pushes to `main` and pull requests targeting `main` with Node 26, then runs `npm install`, `npm run check`, and `npm run build`.
-- `deploy.yml` runs on every push to `main`, checks the app, builds the Docker image, pushes it to `gitea.dylancruz.me`, copies `deploy/docker-compose.yml` to the deployment server, and restarts the app over SSH.
 
 Protect the `main` branch in Gitea and require the `check` job from the `CI` workflow before merging pull requests into `main`.
-
-Configure these repository secrets before enabling deployment:
-
-- `REGISTRY_USERNAME`: Gitea registry username.
-- `REGISTRY_TOKEN`: Gitea token or password with package publish/read access.
-- `DEPLOY_HOST`: deployment server hostname or IP.
-- `DEPLOY_USER`: SSH user on the deployment server.
-- `DEPLOY_SSH_KEY`: private SSH key accepted by the deployment server.
-- `DEPLOY_PATH`: directory on the deployment server, for example `/opt/espresso-logger`.
-- `APP_ORIGIN`: production browser URL, for example `http://192.168.1.50:3000`.
-
-The `deploy.yml` workflow must run on a Docker-capable Gitea runner with access to `docker`, `docker compose`, `ssh`, `scp`, `ssh-keyscan`, and `curl`. Use the default act runner if it already exposes those tools; otherwise, register a dedicated runner label backed by an image that includes them and update `runs-on` in `deploy.yml`.
-
-The deployment workflow writes `${DEPLOY_PATH}/.env` with `IMAGE` and `ORIGIN`, then persists SQLite data in `${DEPLOY_PATH}/data` on the deployment server.
