@@ -66,8 +66,10 @@ file:/app/data/espresso.db
 
 Gitea Actions workflows live in `.gitea/workflows`:
 
-- `ci.yml` runs on every push and pull request with Node 26, then runs `npm install`, `npm run check`, and `npm run build`.
+- `ci.yml` runs on pushes to `main` and pull requests targeting `main` with Node 26, then runs `npm install`, `npm run check`, and `npm run build`.
 - `deploy.yml` runs on every push to `main`, checks the app, builds the Docker image, pushes it to `gitea.dylancruz.me`, copies `deploy/docker-compose.yml` to the deployment server, and restarts the app over SSH.
+
+Protect the `main` branch in Gitea and require the `check` job from the `CI` workflow before merging pull requests into `main`.
 
 Configure these repository secrets before enabling deployment:
 
