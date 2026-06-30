@@ -17,3 +17,8 @@
 - Coolify must persist SQLite data with storage mounted at `/app/data`; do not commit database files.
 - The app is intentionally single-user and LAN-only; do not add auth unless asked.
 - Photo uploads were intentionally deferred for a future iteration.
+
+## Code Guidelines
+- All changes to code should be made on a new branch named accordingly following conventional commits (feature, bugfix, etc)
+- New branches should be narrow in scope, addressing a single feature or bug at once
+- Once complete, the new branch should be merged into the `dev` branch which will be tested by users
