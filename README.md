@@ -5,8 +5,11 @@ A single-user, LAN-only espresso logbook for tracking coffees, Breville Barista 
 ## Features
 
 - Coffee catalog with brand, blend, roast, origin, process, and notes.
+- Per-coffee toggle for whether a blend appears in the Log shot menu.
 - Shot log with dose, yield, time, grind settings, temperature, rating, and tasting notes.
 - Metric/imperial display toggle.
+- Settings-driven field layout with main, extras, and hidden field options.
+- Custom coffee and shot fields without schema changes.
 - SQLite storage in `./data/espresso.db`.
 - Coolify deployment for homelab hosting.
 

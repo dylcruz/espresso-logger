@@ -2,6 +2,7 @@ export type Coffee = {
   id: string;
   brand: string;
   blend: string;
+  showOnLog: boolean;
   roastLevel: string | null;
   roastDate: string | null;
   origin: string | null;

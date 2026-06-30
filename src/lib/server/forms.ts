@@ -25,7 +25,17 @@ export function optionalInteger(formData: FormData, key: string) {
   return Math.trunc(value);
 }
 
+export function optionalCheckbox(formData: FormData, key: string) {
+  return formData.get(key) === 'on';
+}
+
 export function parseDateTime(formData: FormData, key: string) {
+  const timestamp = optionalString(formData, `${key}Ms`);
+  if (timestamp) {
+    const parsedTimestamp = Number(timestamp);
+    if (Number.isFinite(parsedTimestamp)) return parsedTimestamp;
+  }
+
   const value = optionalString(formData, key);
   if (!value) return Date.now();
   const parsed = new Date(value).getTime();
