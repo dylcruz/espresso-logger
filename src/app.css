@@ -89,6 +89,16 @@ label {
   font-weight: 750;
 }
 
+.checkbox-label {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.checkbox-label input {
+  width: auto;
+}
+
 .page-shell {
   margin: 0 auto;
   max-width: 1180px;
@@ -227,6 +237,55 @@ label {
   grid-column: 1 / -1;
 }
 
+.extras {
+  border: 1px solid #ead9c5;
+  border-radius: 1rem;
+  padding: 0.85rem;
+}
+
+.extras summary {
+  color: #5f3b2b;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.extras .form-grid {
+  margin-top: 1rem;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.field-row {
+  align-items: center;
+  border: 1px solid #ead9c5;
+  border-radius: 1rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) 10rem;
+  padding: 0.75rem;
+}
+
+.field-row small {
+  color: #73513d;
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 0.15rem;
+}
+
+.compact-form {
+  margin-top: 1rem;
+}
+
 .table-card {
   overflow: hidden;
 }
@@ -292,7 +351,12 @@ tr:last-child td {
 
   .grid.two,
   .grid.three,
-  .form-grid {
+  .form-grid,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-row {
     grid-template-columns: 1fr;
   }
 

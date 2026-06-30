@@ -11,9 +11,11 @@
 - There is no migration framework: `src/lib/server/db.ts` creates tables and indexes on startup with `CREATE TABLE IF NOT EXISTS`.
 - Type shapes for persisted rows are in `src/lib/server/schema.ts`; keep SQL column aliases in `db.ts` aligned with those camelCase types.
 - Global unit preference is loaded in `src/routes/+layout.server.ts` and passed to pages through layout data.
+- Built-in field layout settings and custom field metadata are defined in `src/lib/fields.ts`; custom field values are stored in generic SQLite rows rather than adding columns.
 
 ## Data Rules
 - Persist weights as grams and temperatures as Celsius; convert display/input values through `src/lib/units.ts`.
+- Persist shot times as epoch milliseconds; datetime-local inputs should submit a client-local timestamp to avoid server timezone drift.
 - Coolify must persist SQLite data with storage mounted at `/app/data`; do not commit database files.
 - The app is intentionally single-user and LAN-only; do not add auth unless asked.
 - Photo uploads were intentionally deferred for a future iteration.

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fieldIsVisible } from '$lib/fields';
   import { formatDate } from '$lib/units';
 
   let { data } = $props();
@@ -20,18 +21,20 @@
       <thead>
         <tr>
           <th>Coffee</th>
-          <th>Roast</th>
-          <th>Origin</th>
-          <th>Roast date</th>
+          {#if fieldIsVisible(data.fieldConfig, 'coffee', 'showOnLog')}<th>Log menu</th>{/if}
+          {#if fieldIsVisible(data.fieldConfig, 'coffee', 'roastLevel')}<th>Roast</th>{/if}
+          {#if fieldIsVisible(data.fieldConfig, 'coffee', 'origin')}<th>Origin</th>{/if}
+          {#if fieldIsVisible(data.fieldConfig, 'coffee', 'roastDate')}<th>Roast date</th>{/if}
         </tr>
       </thead>
       <tbody>
         {#each data.coffees as coffee}
           <tr>
             <td><a href={`/coffees/${coffee.id}`}><strong>{coffee.brand}</strong> {coffee.blend}</a></td>
-            <td>{coffee.roastLevel ?? '-'}</td>
-            <td>{coffee.origin ?? '-'}</td>
-            <td>{coffee.roastDate ? formatDate(coffee.roastDate) : '-'}</td>
+            {#if fieldIsVisible(data.fieldConfig, 'coffee', 'showOnLog')}<td>{coffee.showOnLog ? 'Shown' : 'Hidden'}</td>{/if}
+            {#if fieldIsVisible(data.fieldConfig, 'coffee', 'roastLevel')}<td>{coffee.roastLevel ?? '-'}</td>{/if}
+            {#if fieldIsVisible(data.fieldConfig, 'coffee', 'origin')}<td>{coffee.origin ?? '-'}</td>{/if}
+            {#if fieldIsVisible(data.fieldConfig, 'coffee', 'roastDate')}<td>{coffee.roastDate ? formatDate(coffee.roastDate) : '-'}</td>{/if}
           </tr>
         {/each}
       </tbody>

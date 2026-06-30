@@ -1,9 +1,10 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect, error } from '@sveltejs/kit';
-import { deleteShot, getCoffee, getShot, listCoffees, updateShot } from '$lib/server/db';
-import { getUnitSystem } from '$lib/server/settings';
+import { deleteShot, getCoffee, getCustomFieldValues, getShot, listCoffees, listCustomFields, setCustomFieldValues, updateShot } from '$lib/server/db';
+import { getFieldVisibilityConfig, getUnitSystem } from '$lib/server/settings';
 import { optionalInteger, optionalNumber, optionalString, parseDateTime, requiredString } from '$lib/server/forms';
 import { toStoredTemperature, toStoredWeight } from '$lib/units';
+import { fieldIsVisible } from '$lib/fields';
 
 export const load: PageServerLoad = ({ params }) => {
   const shot = getShot(params.id);
@@ -14,7 +15,10 @@ export const load: PageServerLoad = ({ params }) => {
   return {
     shot,
     coffee,
-    coffees: listCoffees()
+    coffees: listCoffees(),
+    fieldConfig: getFieldVisibilityConfig(),
+    customFields: listCustomFields('shot'),
+    customFieldValues: getCustomFieldValues(params.id)
   };
 };
 
@@ -22,23 +26,32 @@ export const actions = {
   update: async ({ request, params }) => {
     const formData = await request.formData();
     const unitSystem = getUnitSystem();
+    const fieldConfig = getFieldVisibilityConfig();
+    const shot = getShot(params.id);
+    if (!shot) throw error(404, 'Shot not found');
+    const customFields = listCustomFields('shot');
 
     try {
       updateShot(params.id, {
         coffeeId: requiredString(formData, 'coffeeId'),
-        pulledAt: parseDateTime(formData, 'pulledAt'),
+        pulledAt: fieldIsVisible(fieldConfig, 'shot', 'pulledAt') ? parseDateTime(formData, 'pulledAt') : shot.pulledAt,
         drinkType: requiredString(formData, 'drinkType'),
-        doseGrams: toStoredWeight(optionalNumber(formData, 'dose'), unitSystem),
-        yieldGrams: toStoredWeight(optionalNumber(formData, 'yield'), unitSystem),
-        shotTimeSeconds: optionalNumber(formData, 'shotTimeSeconds'),
-        grindSize: optionalString(formData, 'grindSize'),
-        grindTimeSeconds: optionalNumber(formData, 'grindTimeSeconds'),
-        temperatureC: toStoredTemperature(optionalNumber(formData, 'temperature'), unitSystem),
-        rating: optionalInteger(formData, 'rating'),
-        tasteNotes: optionalString(formData, 'tasteNotes'),
-        machineNotes: optionalString(formData, 'machineNotes'),
-        resultNotes: optionalString(formData, 'resultNotes')
+        doseGrams: fieldIsVisible(fieldConfig, 'shot', 'dose') ? toStoredWeight(optionalNumber(formData, 'dose'), unitSystem) : shot.doseGrams,
+        yieldGrams: fieldIsVisible(fieldConfig, 'shot', 'yield') ? toStoredWeight(optionalNumber(formData, 'yield'), unitSystem) : shot.yieldGrams,
+        shotTimeSeconds: fieldIsVisible(fieldConfig, 'shot', 'shotTimeSeconds') ? optionalNumber(formData, 'shotTimeSeconds') : shot.shotTimeSeconds,
+        grindSize: fieldIsVisible(fieldConfig, 'shot', 'grindSize') ? optionalString(formData, 'grindSize') : shot.grindSize,
+        grindTimeSeconds: fieldIsVisible(fieldConfig, 'shot', 'grindTimeSeconds')
+          ? optionalNumber(formData, 'grindTimeSeconds')
+          : shot.grindTimeSeconds,
+        temperatureC: fieldIsVisible(fieldConfig, 'shot', 'temperature')
+          ? toStoredTemperature(optionalNumber(formData, 'temperature'), unitSystem)
+          : shot.temperatureC,
+        rating: fieldIsVisible(fieldConfig, 'shot', 'rating') ? optionalInteger(formData, 'rating') : shot.rating,
+        tasteNotes: fieldIsVisible(fieldConfig, 'shot', 'tasteNotes') ? optionalString(formData, 'tasteNotes') : shot.tasteNotes,
+        machineNotes: fieldIsVisible(fieldConfig, 'shot', 'machineNotes') ? optionalString(formData, 'machineNotes') : shot.machineNotes,
+        resultNotes: fieldIsVisible(fieldConfig, 'shot', 'resultNotes') ? optionalString(formData, 'resultNotes') : shot.resultNotes
       });
+      setCustomFieldValues(params.id, parseCustomFieldValues(formData, customFields));
 
       return { saved: true };
     } catch (error) {
@@ -50,3 +63,11 @@ export const actions = {
     throw redirect(303, '/');
   }
 } satisfies Actions;
+
+function parseCustomFieldValues(formData: FormData, customFields: ReturnType<typeof listCustomFields>) {
+  return Object.fromEntries(
+    customFields
+      .filter((field) => field.visibility !== 'hidden')
+      .map((field) => [`${field.id}`, optionalString(formData, `custom:${field.id}`)])
+  );
+}
